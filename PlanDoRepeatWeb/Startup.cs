@@ -33,7 +33,7 @@ namespace PlanDoRepeatWeb
             services.AddSingleton<TimerRepository>();
 
             services.AddSingleton<UsersService>();
-
+            services.AddSingleton<TimerService>();
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login"));
