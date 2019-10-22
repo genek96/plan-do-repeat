@@ -5,19 +5,16 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using PlanDoRepeatWeb.Models.Authentication;
-using PlanDoRepeatWeb.Models;
-using System.Security.Cryptography;
-using Commons.StringHelpers;
 
 namespace PlanDoRepeatWeb.Controllers.Authentication
 {
     public class AccountController : Controller
     {
-        private readonly UserRepository userRepository;
+        private readonly UsersService usersService;
 
-        public AccountController(UserRepository userService)
+        public AccountController(UsersService usersService)
         {
-            this.userRepository = userService;
+            this.usersService = usersService;
         }
 
         [HttpGet]
@@ -32,11 +29,7 @@ namespace PlanDoRepeatWeb.Controllers.Authentication
         {
             if (ModelState.IsValid)
             {
-                var user = await userRepository
-                    .GetUserByLoginAsync(loginModel.Email)
-                    .ConfigureAwait(false);
-
-                if (user != null && user.Password == HashPassword(loginModel.Password))
+                if (await usersService.LoginAsync(loginModel.Email, loginModel.Password).ConfigureAwait(false))
                 {
                     await AuthenticateAsync(loginModel.Email).ConfigureAwait(false);
                     return RedirectToAction("Index", "Home");
@@ -58,25 +51,12 @@ namespace PlanDoRepeatWeb.Controllers.Authentication
         {
             if (ModelState.IsValid)
             {
-                var user = await userRepository
-                    .GetUserByLoginAsync(registerModel.Email)
-                    .ConfigureAwait(false);
-                
-                if (user == null)
+                if (await usersService.RegisterAsync(registerModel.Email, registerModel.Password).ConfigureAwait(false))
                 {
-                    await userRepository
-                        .CreateUserAsync(
-                            new User
-                            {
-                                Login = registerModel.Email,
-                                Password = HashPassword(registerModel.Password)
-                            })
-                        .ConfigureAwait(false);
-
                     await AuthenticateAsync(registerModel.Email).ConfigureAwait(false);
-                    
                     return RedirectToAction("Index", "Home");
                 }
+
                 ModelState.AddModelError("", "Пользователь с такой почтой уже существует!");
             }
             return View(registerModel);
@@ -109,14 +89,6 @@ namespace PlanDoRepeatWeb.Controllers.Authentication
                 .SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(id));
-        }
-
-        private string HashPassword(string password)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                return sha256.ComputeHash(password.ToByteArray()).ToUtf8String();
-            }
         }
     }
 }

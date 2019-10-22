@@ -24,16 +24,15 @@ namespace PlanDoRepeatWeb
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<UsersDatabaseSettings>(Configuration.GetSection(nameof(UsersDatabaseSettings)));
-
             services.Configure<TimerDatabaseSettings>(Configuration.GetSection(nameof(TimerDatabaseSettings)));
 
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<UsersDatabaseSettings>>().Value);
-
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<TimerDatabaseSettings>>().Value);
 
             services.AddSingleton<UserRepository>();
-
             services.AddSingleton<TimerRepository>();
+
+            services.AddSingleton<UsersService>();
 
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
