@@ -21,57 +21,18 @@ namespace PlanDoRepeatWeb.Models.Timer
             .Find(timer => timer.Id == timerId)
             .FirstOrDefaultAsync();
 
-        public Task StopTimerAsync(string timerId) => Entities
-            .UpdateOneAsync(
-            new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId),
-            Builders<Timer>.Update
-                .Set(timer => timer.State, TimerState.Stoped)
-                .Set(timer => timer.PassedSeconds, 0)
-                .Set(timer => timer.LastUpdate, DateTime.UtcNow.Ticks));
-
-        public async Task PauseTimerAsync(string timerId)
+        public Task UpdateTimerMetaAsync(
+            string timerId,
+            TimerState newState,
+            int passedSeconds,
+            long lastUpdate)
         {
-            var currentTimer = await GetTimerAsync(timerId).ConfigureAwait(false);
-
-            var currentTime = DateTime.UtcNow.Ticks;
-            var timePassed = currentTimer.PassedSeconds
-                + (int)TimeSpan.FromTicks(currentTime - currentTimer.LastUpdate).TotalSeconds;
-
-            if (timePassed > currentTimer.PeriodInSeconds)
-            {
-                timePassed = 0;
-            }
-
-            await Entities
-                .UpdateOneAsync(
-                    new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId),
-                    Builders<Timer>.Update
-                        .Set(timer => timer.State, TimerState.Paused)
-                        .Set(timer => timer.PassedSeconds, timePassed)
-                        .Set(timer => timer.LastUpdate, currentTime))
-                .ConfigureAwait(false);
-        }
-
-        public async Task RunTimerAsync(string timerId)
-        {
-            var currentTimer = await GetTimerAsync(timerId).ConfigureAwait(false);
-
-            var passedSeconds = 0;
-            var currentTime = DateTime.UtcNow.Ticks;
-            if (currentTimer.State == TimerState.Paused)
-            {
-                passedSeconds = currentTimer.PassedSeconds
-                    + (int)TimeSpan.FromTicks(currentTime - currentTimer.LastUpdate).TotalSeconds;
-            }
-
-            await Entities
-                .UpdateOneAsync(
-                    new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId),
-                    Builders<Timer>.Update
-                        .Set(timer => timer.State, TimerState.Active)
-                        .Set(timer => timer.PassedSeconds, passedSeconds)
-                        .Set(timer => timer.LastUpdate, currentTime))
-                .ConfigureAwait(false);
+            return Entities.UpdateOneAsync(
+               new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId),
+               Builders<Timer>.Update
+                   .Set(timer => timer.State, newState)
+                   .Set(timer => timer.PassedSeconds, passedSeconds)
+                   .Set(timer => timer.LastUpdate, lastUpdate));
         }
 
         public Task CreateTimerAsync(Timer timer)
