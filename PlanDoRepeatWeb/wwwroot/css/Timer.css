@@ -1,0 +1,23 @@
+﻿.timers-list{
+    width: 100%;
+    text-align: center;
+}
+
+.timer{
+    height: 50px;
+}
+
+.timer-body {
+    display: inline-block;
+    width: 80%;
+}
+
+.timer-buttons {
+    display: inline-block;
+    width: 20%;
+}
+
+.timer-play {
+    background-image: url("../images/play.png");
+    background-size: cover;
+}

@@ -12,11 +12,11 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace PlanDoRepeatWeb.Controllers.Timer
 {
-    public class TimerController : Controller
+    public class TimersController : Controller
     {
         [Authorize]
         [HttpGet]
-        public IActionResult GetAllTimers()
+        public IActionResult AllTimers()
         {
             return View();
         }
