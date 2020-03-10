@@ -1,11 +1,14 @@
 ﻿<div class="timers-list">
-    <div class="timer">
-        <div class="timer-body">Название - Описание</div>
-        <div class="timer-buttons">
-            <div class="timer-play">Старт/Пауза</div>
-            <div class="timer-item">Repeat</div>
-            <div class="timer-item">Stop</div>
-            <div class="timer-item">Delete</div>
-        </div>
-    </div>
+    @{
+        for (int i = 0; i < 10; i++)
+        {
+            <div class="timer">
+                <div class="timer-body">Название - Описание</div>
+                <div class="timer-button timer-button-repeat"></div>
+                <div class="timer-button timer-button-play"></div>
+                <div class="timer-button timer-button-stop"></div>
+                <div class="timer-button timer-button-delete"></div>
+            </div>
+        }
+    }
 </div>

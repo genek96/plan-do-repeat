@@ -3,21 +3,43 @@
     text-align: center;
 }
 
-.timer{
+.timer {
+    background: #bf570d1f;
     height: 50px;
+    margin-bottom: 10px;
 }
 
 .timer-body {
     display: inline-block;
-    width: 80%;
+    width: 75%;
+    height: inherit;
+    vertical-align: bottom;
 }
 
-.timer-buttons {
+.timer-button {
+    width: 5%;
+    height: inherit;
     display: inline-block;
-    width: 20%;
+    background-repeat: no-repeat;
+    background-size: 90%;
 }
 
-.timer-play {
+.timer-button-repeat {
+    background-image: url("../images/repeat.png");
+}
+
+.timer-button-play {
     background-image: url("../images/play.png");
-    background-size: cover;
+}
+
+.timer-button-pause {
+    background-image: url("../images/pause.png");
+}
+
+.timer-button-stop {
+    background-image: url("../images/stop.png");
+}
+
+.timer-button-delete {
+    background-image: url("../images/delete.png");
 }
