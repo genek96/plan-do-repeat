@@ -1,18 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
+using PlanDoRepeatWeb.Implementations.Services;
 using PlanDoRepeatWeb.Models.Authentication;
 
-namespace PlanDoRepeatWeb.Controllers.Authentication
+namespace PlanDoRepeatWeb.Controllers.Account
 {
     public class AccountController : Controller
     {
-        private readonly UsersService usersService;
+        private readonly IUsersService usersService;
 
-        public AccountController(UsersService usersService)
+        public AccountController(IUsersService usersService)
         {
             this.usersService = usersService;
         }
@@ -34,8 +36,10 @@ namespace PlanDoRepeatWeb.Controllers.Authentication
                     await AuthenticateAsync(loginModel.Email).ConfigureAwait(false);
                     return RedirectToAction("Index", "Home");
                 }
+
                 ModelState.AddModelError("", "Некорректная почта или праоль");
             }
+
             return View(loginModel);
         }
 
@@ -51,14 +55,21 @@ namespace PlanDoRepeatWeb.Controllers.Authentication
         {
             if (ModelState.IsValid)
             {
-                if (await usersService.RegisterAsync(registerModel.Email, registerModel.Password).ConfigureAwait(false))
+                try
                 {
-                    await AuthenticateAsync(registerModel.Email).ConfigureAwait(false);
-                    return RedirectToAction("Index", "Home");
-                }
+                    var user = await usersService
+                        .RegisterAsync(registerModel)
+                        .ConfigureAwait(false);
 
-                ModelState.AddModelError("", "Пользователь с такой почтой уже существует!");
+                    await AuthenticateAsync(user.Id).ConfigureAwait(false);
+                    return RedirectToAction("AllTimers", "Timers");
+                }
+                catch (ArgumentException ex)
+                {
+                    ModelState.AddModelError(nameof(registerModel.Email), ex.Message);
+                }
             }
+
             return View(registerModel);
         }
 
@@ -71,15 +82,15 @@ namespace PlanDoRepeatWeb.Controllers.Authentication
             return RedirectToAction("Login", "Account");
         }
 
-        
-        private Task AuthenticateAsync(string userName)
+
+        private Task AuthenticateAsync(string userId)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName)
+                new Claim(ClaimsIdentity.DefaultNameClaimType, userId)
             };
 
-            ClaimsIdentity id = new ClaimsIdentity(
+            var id = new ClaimsIdentity(
                 claims,
                 "ApplicationCookie",
                 ClaimsIdentity.DefaultNameClaimType,

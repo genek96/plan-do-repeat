@@ -1,12 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using Commons.StringHelpers;
 using PlanDoRepeatWeb.Implementations.Repositories;
+using PlanDoRepeatWeb.Models.Authentication;
 using PlanDoRepeatWeb.Models.Database;
 
-namespace PlanDoRepeatWeb.Models.Authentication
+namespace PlanDoRepeatWeb.Implementations.Services
 {
-    public class UsersService
+    public class UsersService : IUsersService
     {
         private readonly UserRepository userRepository;
 
@@ -24,33 +26,35 @@ namespace PlanDoRepeatWeb.Models.Authentication
             return user != null && user.Password == HashPassword(password);
         }
 
-        public async Task<bool> RegisterAsync(string login, string password)
+        public async Task<User> RegisterAsync(RegisterModel registerModel)
         {
             var user = await userRepository
-                    .GetUserByLoginAsync(login)
-                    .ConfigureAwait(false);
+                .GetUserByLoginAsync(registerModel.Email)
+                .ConfigureAwait(false);
 
-            if (user == null)
+            if (user != null)
             {
-                await userRepository
-                    .CreateUserAsync(
-                        new User
-                        {
-                            Login = login,
-                            Password = HashPassword(password)
-                        })
-                    .ConfigureAwait(false);
-                return true;
+                throw new ArgumentException("Такой пользователь уже существует!");
             }
-            return false;
+
+            await userRepository
+                .CreateUserAsync(
+                    new User
+                    {
+                        Login = registerModel.Email,
+                        Password = HashPassword(registerModel.Password)
+                    })
+                .ConfigureAwait(false);
+
+            return await userRepository
+                .GetUserByLoginAsync(registerModel.Email)
+                .ConfigureAwait(false);
         }
 
-        private string HashPassword(string password)
+        private static string HashPassword(string password)
         {
-            using (var sha256 = SHA256.Create())
-            {
-                return sha256.ComputeHash(password.ToByteArray()).ToUtf8String();
-            }
+            using var sha256 = SHA256.Create();
+            return sha256.ComputeHash(password.ToByteArray()).ToUtf8String();
         }
     }
 }
