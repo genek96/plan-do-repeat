@@ -1,4 +1,4 @@
-﻿namespace PlanDoRepeatWeb.Configurations.DatabaseSettings
+﻿namespace Commons.MongoDB
 {
     public interface IMongoDatabaseSettings
     {

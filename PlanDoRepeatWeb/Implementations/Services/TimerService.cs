@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PlanDoRepeatWeb.Models.Database;
 
 namespace PlanDoRepeatWeb.Models.Timer
 {
@@ -13,10 +14,10 @@ namespace PlanDoRepeatWeb.Models.Timer
             this.timerRepository = timerRepository;
         }
 
-        public Task<List<Timer>> GetAllTimersForUserAsync(string userId) =>
+        public Task<List<Database.Timer>> GetAllTimersForUserAsync(string userId) =>
             timerRepository.GetAllTimersAsync(userId);
 
-        public Task CreateTimerAsync(Timer timer) =>
+        public Task CreateTimerAsync(Database.Timer timer) =>
             timerRepository.CreateTimerAsync(timer);
 
         public Task UpdateTimerAsync(

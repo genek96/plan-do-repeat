@@ -7,6 +7,7 @@ using PlanDoRepeatWeb.Models.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using PlanDoRepeatWeb.Configurations.DatabaseSettings;
+using PlanDoRepeatWeb.Implementations.Repositories;
 using PlanDoRepeatWeb.Models.Timer;
 
 namespace PlanDoRepeatWeb

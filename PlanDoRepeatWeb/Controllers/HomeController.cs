@@ -17,7 +17,7 @@ namespace PlanDoRepeatWeb.Controllers
         }
 
         [Authorize]
-        public IActionResult IndexAsync()
+        public IActionResult Index()
         {
             return View();
         }

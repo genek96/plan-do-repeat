@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace PlanDoRepeatWeb.Models.Timer
+namespace PlanDoRepeatWeb.Models.Database
 {
     public enum TimerState : byte
     {

@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading.Tasks;
+using Commons.MongoDB;
 using MongoDB.Driver;
 using PlanDoRepeatWeb.Configurations.DatabaseSettings;
-using System.Threading.Tasks;
+using PlanDoRepeatWeb.Models.Database;
 
-namespace PlanDoRepeatWeb.Models.Authentication
+namespace PlanDoRepeatWeb.Implementations.Repositories
 {
-    public class UserRepository : MongoDBContext<User>
+    public class UserRepository : MongoDbContext<User>
     {
         public UserRepository(UsersDatabaseSettings settings)
             : base(settings)

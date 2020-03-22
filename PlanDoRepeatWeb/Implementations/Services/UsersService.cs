@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using System.Security.Cryptography;
 using Commons.StringHelpers;
+using PlanDoRepeatWeb.Implementations.Repositories;
+using PlanDoRepeatWeb.Models.Database;
 
 namespace PlanDoRepeatWeb.Models.Authentication
 {
