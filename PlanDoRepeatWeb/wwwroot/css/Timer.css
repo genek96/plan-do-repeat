@@ -9,6 +9,12 @@
     margin-bottom: 10px;
 }
 
+.new-timer {
+    background: #bf570d1f;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
 .timer-body {
     display: inline-block;
     width: 75%;

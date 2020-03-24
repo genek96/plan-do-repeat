@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PlanDoRepeatWeb.Implementations.Repositories;
 using PlanDoRepeatWeb.Models.Database;
+using PlanDoRepeatWeb.Models.Web;
 
-namespace PlanDoRepeatWeb.Models.Timer
+namespace PlanDoRepeatWeb.Implementations.Services
 {
-    public class TimerService
+    public class TimerService : ITimerService
     {
         private readonly TimerRepository timerRepository;
 
@@ -14,11 +16,17 @@ namespace PlanDoRepeatWeb.Models.Timer
             this.timerRepository = timerRepository;
         }
 
-        public Task<List<Database.Timer>> GetAllTimersForUserAsync(string userId) =>
+        public Task<List<Timer>> GetAllTimersForUserAsync(string userId) =>
             timerRepository.GetAllTimersAsync(userId);
 
-        public Task CreateTimerAsync(Database.Timer timer) =>
-            timerRepository.CreateTimerAsync(timer);
+        public Task CreateTimerAsync(string userId, TimerModel timer) =>
+            timerRepository.CreateTimerAsync(new Timer
+            {
+                Name = timer.Name,
+                Description = timer.Description,
+                PeriodInSeconds = timer.Period,
+                UserId = userId
+            });
 
         public Task UpdateTimerAsync(
             string timerId,
@@ -29,7 +37,7 @@ namespace PlanDoRepeatWeb.Models.Timer
 
         public Task StopTimerAsync(string timerId)
         {
-            return timerRepository.UpdateTimerMetaAsync(timerId, TimerState.Stoped, 0, DateTime.UtcNow.Ticks);
+            return timerRepository.UpdateTimerMetaAsync(timerId, TimerState.Stopped, 0, DateTime.UtcNow.Ticks);
         }
 
         public async Task RunTimerAsync(string timerId)

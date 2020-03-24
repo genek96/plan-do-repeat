@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PlanDoRepeatWeb.Models.Authentication
+namespace PlanDoRepeatWeb.Models.Web.Authentication
 {
     public class LoginModel
     {

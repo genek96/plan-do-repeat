@@ -17,13 +17,18 @@ namespace PlanDoRepeatWeb.Implementations.Services
             this.userRepository = userRepository;
         }
 
-        public async Task<bool> LoginAsync(string login, string password)
+        public async Task<User> LoginAsync(string login, string password)
         {
             var user = await userRepository
                 .GetUserByLoginAsync(login)
                 .ConfigureAwait(false);
 
-            return user != null && user.Password == HashPassword(password);
+            if (user != null && user.Password == HashPassword(password))
+            {
+                return user;
+            }
+
+            return null;
         }
 
         public async Task<User> RegisterAsync(RegisterModel registerModel)

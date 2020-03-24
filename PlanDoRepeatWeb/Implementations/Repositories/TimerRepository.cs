@@ -1,25 +1,25 @@
-﻿using MongoDB.Driver;
-using PlanDoRepeatWeb.Configurations.DatabaseSettings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Commons.MongoDB;
+using MongoDB.Driver;
+using PlanDoRepeatWeb.Configurations.DatabaseSettings;
 using PlanDoRepeatWeb.Models.Database;
 
-namespace PlanDoRepeatWeb.Models.Timer
+namespace PlanDoRepeatWeb.Implementations.Repositories
 {
-    public class TimerRepository : MongoDbContext<Database.Timer>
+    public class TimerRepository : MongoDbContext<Timer>
     {
         public TimerRepository(TimerDatabaseSettings settings) 
             : base(settings)
         {
         }
 
-        public Task<List<Database.Timer>> GetAllTimersAsync(string userId) => Entities
+        public Task<List<Timer>> GetAllTimersAsync(string userId) => Entities
                 .Find(x => x.UserId == userId)
                 .ToListAsync();
 
-        public Task<Database.Timer> GetTimerAsync(string timerId) => Entities
+        public Task<Timer> GetTimerAsync(string timerId) => Entities
             .Find(timer => timer.Id == timerId)
             .FirstOrDefaultAsync();
 
@@ -30,19 +30,19 @@ namespace PlanDoRepeatWeb.Models.Timer
             long lastUpdate)
         {
             return Entities.UpdateOneAsync(
-               new FilterDefinitionBuilder<Database.Timer>().Where(timer => timer.Id == timerId),
-               Builders<Database.Timer>.Update
+               new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId),
+               Builders<Timer>.Update
                    .Set(timer => timer.State, newState)
                    .Set(timer => timer.PassedSeconds, passedSeconds)
                    .Set(timer => timer.LastUpdate, lastUpdate));
         }
 
-        public Task CreateTimerAsync(Database.Timer timer)
+        public Task CreateTimerAsync(Timer timer)
         {
             ValidatePeriod(timer.PeriodInSeconds);
             return Entities
                 .InsertOneAsync(
-                    new Database.Timer
+                    new Timer
                     {
                         Name = timer.Name,
                         Description = timer.Description,
@@ -60,8 +60,8 @@ namespace PlanDoRepeatWeb.Models.Timer
             string newDescription = null,
             int? newPeriod = null)
         {
-            var filter = new FilterDefinitionBuilder<Database.Timer>().Where(timer => timer.Id == timerId);
-            var updateDefinition = Builders<Database.Timer>.Update
+            var filter = new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId);
+            var updateDefinition = Builders<Timer>.Update
                 .Set(timer => timer.PassedSeconds, 0)
                 .Set(timer => timer.State, TimerState.Paused)
                 .Set(timer => timer.LastUpdate, DateTime.UtcNow.Ticks);

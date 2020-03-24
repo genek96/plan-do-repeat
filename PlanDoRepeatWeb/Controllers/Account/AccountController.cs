@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using PlanDoRepeatWeb.Implementations.Services;
 using PlanDoRepeatWeb.Models.Authentication;
+using PlanDoRepeatWeb.Models.Web.Authentication;
 
 namespace PlanDoRepeatWeb.Controllers.Account
 {
@@ -31,10 +32,13 @@ namespace PlanDoRepeatWeb.Controllers.Account
         {
             if (ModelState.IsValid)
             {
-                if (await usersService.LoginAsync(loginModel.Email, loginModel.Password).ConfigureAwait(false))
+                var authorizedUser = await usersService
+                    .LoginAsync(loginModel.Email, loginModel.Password)
+                    .ConfigureAwait(false);
+                if (authorizedUser != null)
                 {
-                    await AuthenticateAsync(loginModel.Email).ConfigureAwait(false);
-                    return RedirectToAction("Index", "Home");
+                    await AuthenticateAsync(authorizedUser.Id.ToString()).ConfigureAwait(false);
+                    return RedirectToAction("AllTimers", "Timers");
                 }
 
                 ModelState.AddModelError("", "Некорректная почта или праоль");
@@ -61,7 +65,7 @@ namespace PlanDoRepeatWeb.Controllers.Account
                         .RegisterAsync(registerModel)
                         .ConfigureAwait(false);
 
-                    await AuthenticateAsync(user.Id).ConfigureAwait(false);
+                    await AuthenticateAsync(user.Id.ToString()).ConfigureAwait(false);
                     return RedirectToAction("AllTimers", "Timers");
                 }
                 catch (ArgumentException ex)
