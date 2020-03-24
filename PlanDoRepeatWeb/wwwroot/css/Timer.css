@@ -1,0 +1,51 @@
+﻿.timers-list{
+    width: 100%;
+    text-align: center;
+}
+
+.timer {
+    background: #bf570d1f;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.new-timer {
+    background: #bf570d1f;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.timer-body {
+    display: inline-block;
+    width: 75%;
+    height: inherit;
+    vertical-align: bottom;
+}
+
+.timer-button {
+    width: 5%;
+    height: inherit;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: 90%;
+}
+
+.timer-button-repeat {
+    background-image: url("../images/repeat.png");
+}
+
+.timer-button-play {
+    background-image: url("../images/play.png");
+}
+
+.timer-button-pause {
+    background-image: url("../images/pause.png");
+}
+
+.timer-button-stop {
+    background-image: url("../images/stop.png");
+}
+
+.timer-button-delete {
+    background-image: url("../images/delete.png");
+}

@@ -1,12 +1,14 @@
-﻿using MongoDB.Driver;
-using PlanDoRepeatWeb.Configurations.DatabaseSettings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Commons.MongoDB;
+using MongoDB.Driver;
+using PlanDoRepeatWeb.Configurations.DatabaseSettings;
+using PlanDoRepeatWeb.Models.Database;
 
-namespace PlanDoRepeatWeb.Models.Timer
+namespace PlanDoRepeatWeb.Implementations.Repositories
 {
-    public class TimerRepository : MongoDBContext<Timer>
+    public class TimerRepository : MongoDbContext<Timer>
     {
         public TimerRepository(TimerDatabaseSettings settings) 
             : base(settings)

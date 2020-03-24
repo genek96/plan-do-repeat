@@ -1,11 +1,12 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace PlanDoRepeatWeb.Models.Timer
+namespace PlanDoRepeatWeb.Models.Database
 {
     public enum TimerState : byte
     {
-        Stoped = 0,
+        Stopped = 0,
         Active = 1,
         Paused = 2
     }
@@ -23,13 +24,10 @@ namespace PlanDoRepeatWeb.Models.Timer
 
         public string Description { get; set; }
 
-        [BsonElement("Period")]
         public int PeriodInSeconds { get; set; }
 
-        [BsonElement("Remaining")]
         public int PassedSeconds { get; set; }
 
-        [BsonRepresentation(BsonType.Timestamp)]
         public long LastUpdate { get; set; }    //UTC time in ticks
 
         [BsonRepresentation(BsonType.Int32)]

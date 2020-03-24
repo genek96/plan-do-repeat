@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PlanDoRepeatWeb.Models.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using PlanDoRepeatWeb.Configurations.DatabaseSettings;
-using PlanDoRepeatWeb.Models.Timer;
+using PlanDoRepeatWeb.Implementations.Repositories;
+using PlanDoRepeatWeb.Implementations.Services;
 
 namespace PlanDoRepeatWeb
 {
@@ -32,8 +32,9 @@ namespace PlanDoRepeatWeb
             services.AddSingleton<UserRepository>();
             services.AddSingleton<TimerRepository>();
 
-            services.AddSingleton<UsersService>();
-            services.AddSingleton<TimerService>();
+            services.AddSingleton(typeof(IUsersService), typeof(UsersService));
+            services.AddSingleton(typeof(ITimerService), typeof(TimerService));
+
             services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options => options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login"));

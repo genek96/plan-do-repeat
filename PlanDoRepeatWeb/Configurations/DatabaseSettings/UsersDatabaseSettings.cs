@@ -1,4 +1,6 @@
-﻿namespace PlanDoRepeatWeb.Configurations.DatabaseSettings
+﻿using Commons.MongoDB;
+
+namespace PlanDoRepeatWeb.Configurations.DatabaseSettings
 {
     public class UsersDatabaseSettings : IMongoDatabaseSettings
     {
