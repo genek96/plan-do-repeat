@@ -1,3 +1,5 @@
+using JavaScriptEngineSwitcher.ChakraCore;
+using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -5,9 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using PlanDoRepeatWeb.Configurations.DatabaseSettings;
 using PlanDoRepeatWeb.Implementations.Repositories;
 using PlanDoRepeatWeb.Implementations.Services;
+using React.AspNet;
 
 namespace PlanDoRepeatWeb
 {
@@ -23,6 +27,11 @@ namespace PlanDoRepeatWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddReact();
+            services.AddJsEngineSwitcher(options =>
+                options.DefaultEngineName = ChakraCoreJsEngine.EngineName).AddChakraCore();
+            
             services.Configure<UsersDatabaseSettings>(Configuration.GetSection(nameof(UsersDatabaseSettings)));
             services.Configure<TimerDatabaseSettings>(Configuration.GetSection(nameof(TimerDatabaseSettings)));
 
@@ -56,6 +65,7 @@ namespace PlanDoRepeatWeb
                 app.UseHsts();
             }
 
+            app.UseReact(config => { });
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
