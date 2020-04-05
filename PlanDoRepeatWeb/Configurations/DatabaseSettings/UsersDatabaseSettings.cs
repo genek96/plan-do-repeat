@@ -2,10 +2,7 @@
 
 namespace PlanDoRepeatWeb.Configurations.DatabaseSettings
 {
-    public class UsersDatabaseSettings : IMongoDatabaseSettings
+    public class UsersDatabaseSettings : MongoDatabaseSettings
     {
-        public string CollectionName { get; set; }
-        public string ConnectionString { get; set; }
-        public string DatabaseName { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace Commons.MongoDB
         private readonly IMongoDatabase database; // база данных
         private readonly string collection;
 
-        public MongoDbContext(IMongoDatabaseSettings settings)
+        public MongoDbContext(MongoDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             database = client.GetDatabase(settings.DatabaseName);

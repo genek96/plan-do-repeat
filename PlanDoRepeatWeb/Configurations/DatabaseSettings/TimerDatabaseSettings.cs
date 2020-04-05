@@ -2,10 +2,7 @@
 
 namespace PlanDoRepeatWeb.Configurations.DatabaseSettings
 {
-    public class TimerDatabaseSettings : IMongoDatabaseSettings
+    public class TimerDatabaseSettings : MongoDatabaseSettings
     {
-        public string CollectionName { get; set; }
-        public string ConnectionString { get; set; }
-        public string DatabaseName { get; set; }
     }
 }
