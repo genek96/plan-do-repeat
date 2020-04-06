@@ -17,25 +17,14 @@ namespace PlanDoRepeatWeb.Controllers.Timer
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> AllTimers()
+        public IActionResult AllTimers()
         {
-            var userId =  HttpContext.User.Identity.Name;
-            var timers = await timerService
-                .GetAllTimersForUserAsync(userId)
-                .ConfigureAwait(false);
-            return View(timers);
+            return View();
         }
 
         [Authorize]
-        [HttpGet]
-        public IActionResult AddNewTimer()
-        {
-            return RedirectToAction("AllTimers");
-        }
-        
-        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddNewTimer(TimerModel newTimer)
+        public async Task<IActionResult> AllTimers(TimerModel newTimer)
         {
             await timerService.CreateTimerAsync(HttpContext.User.Identity.Name, newTimer);
             return RedirectToAction("AllTimers");
