@@ -9,9 +9,9 @@ namespace PlanDoRepeatWeb.Implementations.Services
 {
     public class TimerService : ITimerService
     {
-        private readonly TimerRepository timerRepository;
+        private readonly ITimerRepository timerRepository;
 
-        public TimerService(TimerRepository timerRepository)
+        public TimerService(ITimerRepository timerRepository)
         {
             this.timerRepository = timerRepository;
         }
@@ -35,23 +35,39 @@ namespace PlanDoRepeatWeb.Implementations.Services
             int? newPeriod = null) =>
             timerRepository.UpdateTimerAsync(timerId, newName, newDescription, newPeriod);
 
-        public Task StopTimerAsync(string timerId)
-        {
-            return timerRepository.UpdateTimerMetaAsync(timerId, TimerState.Stopped, 0, DateTime.UtcNow.Ticks);
-        }
-
-        public async Task RunTimerAsync(string timerId)
+        public async Task StopTimerAsync(string userId, string timerId)
         {
             var currentTimer = await timerRepository
                 .GetTimerAsync(timerId)
                 .ConfigureAwait(false);
+            currentTimer = currentTimer ?? throw new ArgumentException($"Timer with {timerId} was not found!");
+            ValidateUserHasAccessToTimer(userId, currentTimer);
+
+            if (currentTimer.State == TimerState.Stopped)
+            {
+                return;
+            }
+
+            await timerRepository
+                .UpdateTimerMetaAsync(timerId, TimerState.Stopped, 0, DateTime.UtcNow.Ticks)
+                .ConfigureAwait(false);
+        }
+
+        public async Task RunTimerAsync(string userId, string timerId)
+        {
+            var currentTimer = await timerRepository
+                .GetTimerAsync(timerId)
+                .ConfigureAwait(false);
+
+            currentTimer = currentTimer ?? throw new ArgumentException($"Timer with {timerId} was not found!");
+            ValidateUserHasAccessToTimer(userId, currentTimer);
 
             var passedSeconds = 0;
             var currentTime = DateTime.UtcNow.Ticks;
             if (currentTimer.State == TimerState.Paused)
             {
                 passedSeconds = currentTimer.PassedSeconds
-                    + (int)TimeSpan.FromTicks(currentTime - currentTimer.LastUpdate).TotalSeconds;
+                                + (int) TimeSpan.FromTicks(currentTime - currentTimer.LastUpdate).TotalSeconds;
             }
 
             await timerRepository
@@ -59,15 +75,30 @@ namespace PlanDoRepeatWeb.Implementations.Services
                 .ConfigureAwait(false);
         }
 
-        public async Task PauseTimerAsync(string timerId)
+        public async Task DeleteTimerAsync(string userId, string timerId)
         {
             var currentTimer = await timerRepository
                 .GetTimerAsync(timerId)
                 .ConfigureAwait(false);
 
+            currentTimer = currentTimer ?? throw new ArgumentException($"Timer with {timerId} was not found!");
+            ValidateUserHasAccessToTimer(userId, currentTimer);
+
+            await timerRepository.DeleteTimerAsync(timerId).ConfigureAwait(false);
+        }
+
+        public async Task PauseTimerAsync(string userId, string timerId)
+        {
+            var currentTimer = await timerRepository
+                .GetTimerAsync(timerId)
+                .ConfigureAwait(false);
+
+            currentTimer = currentTimer ?? throw new ArgumentException($"Timer with {timerId} was not found!");
+            ValidateUserHasAccessToTimer(userId, currentTimer);
+
             var currentTime = DateTime.UtcNow.Ticks;
             var timePassed = currentTimer.PassedSeconds
-                + (int)TimeSpan.FromTicks(currentTime - currentTimer.LastUpdate).TotalSeconds;
+                             + (int) TimeSpan.FromTicks(currentTime - currentTimer.LastUpdate).TotalSeconds;
 
             if (timePassed > currentTimer.PeriodInSeconds)
             {
@@ -77,6 +108,15 @@ namespace PlanDoRepeatWeb.Implementations.Services
             await timerRepository
                 .UpdateTimerMetaAsync(timerId, TimerState.Paused, timePassed, currentTime)
                 .ConfigureAwait(false);
+        }
+
+        private void ValidateUserHasAccessToTimer(string userId, Timer timer)
+        {
+            if (timer.UserId != userId)
+            {
+                throw new UnauthorizedAccessException(
+                    $"The timer with id={timer.Id} doesn't belong to authenticated user!");
+            }
         }
     }
 }

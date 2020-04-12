@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using PlanDoRepeatWeb.Configurations.DatabaseSettings;
+using PlanDoRepeatWeb.Implementations.Middleware;
 using PlanDoRepeatWeb.Implementations.Repositories;
 using PlanDoRepeatWeb.Implementations.Services;
 using React.AspNet;
@@ -38,8 +39,8 @@ namespace PlanDoRepeatWeb
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<UsersDatabaseSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<TimerDatabaseSettings>>().Value);
 
-            services.AddSingleton<UserRepository>();
-            services.AddSingleton<TimerRepository>();
+            services.AddSingleton(typeof(ITimerRepository), typeof(TimerRepository));
+            services.AddSingleton(typeof(IUserRepository), typeof(UserRepository));
 
             services.AddSingleton(typeof(IUsersService), typeof(UsersService));
             services.AddSingleton(typeof(ITimerService), typeof(TimerService));
@@ -65,6 +66,7 @@ namespace PlanDoRepeatWeb
                 app.UseHsts();
             }
 
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseReact(config => { });
             app.UseHttpsRedirection();
             app.UseStaticFiles();

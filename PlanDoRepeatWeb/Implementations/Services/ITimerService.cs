@@ -16,8 +16,9 @@ namespace PlanDoRepeatWeb.Implementations.Services
             string newDescription = null,
             int? newPeriod = null);
 
-        Task StopTimerAsync(string timerId);
-        Task RunTimerAsync(string timerId);
-        Task PauseTimerAsync(string timerId);
+        Task StopTimerAsync(string userId, string timerId);
+        Task RunTimerAsync(string userId, string timerId);
+        Task DeleteTimerAsync(string userId, string timerId);
+        Task PauseTimerAsync(string userId, string timerId);
     }
 }

@@ -10,9 +10,9 @@ namespace PlanDoRepeatWeb.Implementations.Services
 {
     public class UsersService : IUsersService
     {
-        private readonly UserRepository userRepository;
+        private readonly IUserRepository userRepository;
 
-        public UsersService(UserRepository userRepository)
+        public UsersService(IUserRepository userRepository)
         {
             this.userRepository = userRepository;
         }

@@ -10,5 +10,9 @@ namespace Commons.StringHelpers
         {
             return Encoding.UTF8.GetBytes(source);
         }
+        public static bool IsNullOrEmpty(this string str)
+        {
+            return string.IsNullOrEmpty(str);
+        }
     }
 }
