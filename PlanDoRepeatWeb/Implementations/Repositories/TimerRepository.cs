@@ -23,7 +23,7 @@ namespace PlanDoRepeatWeb.Implementations.Repositories
             .Find(timer => timer.Id == timerId)
             .FirstOrDefaultAsync();
 
-        public Task UpdateTimerMetaAsync(
+        public Task UpdateTimerStateAsync(
             string timerId,
             TimerState newState,
             int passedSeconds,

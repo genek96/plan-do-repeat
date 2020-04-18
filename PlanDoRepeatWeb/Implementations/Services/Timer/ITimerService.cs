@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using PlanDoRepeatWeb.Models.Web;
 
-namespace PlanDoRepeatWeb.Implementations.Services
+namespace PlanDoRepeatWeb.Implementations.Services.Timer
 {
     public interface ITimerService
     {
@@ -16,9 +16,6 @@ namespace PlanDoRepeatWeb.Implementations.Services
             string newDescription = null,
             int? newPeriod = null);
 
-        Task StopTimerAsync(string userId, string timerId);
-        Task RunTimerAsync(string userId, string timerId);
-        Task DeleteTimerAsync(string userId, string timerId);
-        Task PauseTimerAsync(string userId, string timerId);
+        Task DoActionOnTimer(string userId, string timerId, TimerAction action);
     }
 }

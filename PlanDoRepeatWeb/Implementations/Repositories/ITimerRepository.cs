@@ -9,7 +9,7 @@ namespace PlanDoRepeatWeb.Implementations.Repositories
         Task<List<Timer>> GetAllTimersAsync(string userId);
         Task<Timer> GetTimerAsync(string timerId);
 
-        Task UpdateTimerMetaAsync(
+        Task UpdateTimerStateAsync(
             string timerId,
             TimerState newState,
             int passedSeconds,

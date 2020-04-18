@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PlanDoRepeatWeb.Implementations.Services;
 using System.Text.Json;
 using Commons.StringHelpers;
-using PlanDoRepeatWeb.Models.Web;
+using PlanDoRepeatWeb.Implementations.Services.Timer;
 
 namespace PlanDoRepeatWeb.Controllers.Timer
 {
@@ -30,53 +30,14 @@ namespace PlanDoRepeatWeb.Controllers.Timer
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> StartTimer(string timerId)
+        public async Task<IActionResult> DoActionOnTimer(string timerId, [FromQuery] TimerAction action)
         {
             if (timerId.IsNullOrEmpty())
             {
                 return BadRequest($"{nameof(timerId)} must be specified!");
             }
             var userId =  HttpContext.User.Identity.Name;
-            await timerService.RunTimerAsync(userId, timerId).ConfigureAwait(false);
-            return NoContent();
-        }
-        
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> StopTimer(string timerId)
-        {
-            if (timerId.IsNullOrEmpty())
-            {
-                return BadRequest($"{nameof(timerId)} must be specified!");
-            }
-            var userId =  HttpContext.User.Identity.Name;
-            await timerService.StopTimerAsync(userId, timerId).ConfigureAwait(false);
-            return NoContent();
-        }
-        
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> PauseTimer(string timerId)
-        {
-            if (timerId.IsNullOrEmpty())
-            {
-                return BadRequest($"{nameof(timerId)} must be specified!");
-            }
-            var userId =  HttpContext.User.Identity.Name;
-            await timerService.PauseTimerAsync(userId, timerId).ConfigureAwait(false);
-            return NoContent();
-        }
-        
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> DeleteTimer(string timerId)
-        {
-            if (timerId.IsNullOrEmpty())
-            {
-                return BadRequest($"{nameof(timerId)} must be specified!");
-            }
-            var userId =  HttpContext.User.Identity.Name;
-            await timerService.DeleteTimerAsync(userId, timerId).ConfigureAwait(false);
+            await timerService.DoActionOnTimer(userId, timerId, action).ConfigureAwait(false);
             return NoContent();
         }
     }

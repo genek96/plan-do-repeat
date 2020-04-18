@@ -12,6 +12,7 @@ using PlanDoRepeatWeb.Configurations.DatabaseSettings;
 using PlanDoRepeatWeb.Implementations.Middleware;
 using PlanDoRepeatWeb.Implementations.Repositories;
 using PlanDoRepeatWeb.Implementations.Services;
+using PlanDoRepeatWeb.Implementations.Services.Timer;
 using React.AspNet;
 
 namespace PlanDoRepeatWeb

@@ -1,36 +1,56 @@
-﻿function Play(props){
-    return (<div className="timer-button timer-button-play" onClick={props.onClick}/>);    
+﻿function Play(props) {
+    return (<div className="timer-button timer-button-play" onClick={props.onClick}/>);
 }
 
-function Pause(props){
+function Pause(props) {
     return (<div className="timer-button timer-button-pause" onClick={props.onClick}/>);
 }
 
+function Stop(props) {
+    return (<div className="timer-button timer-button-stop" onClick={props.onClick}/>);
+}
+
+function Repeat(props) {
+    return (<div className="timer-button timer-button-repeat" onClick={props.onClick}/>);
+}
+
+function Delete(props) {
+    return (<div className="timer-button timer-button-delete" onClick={props.onClick}/>);
+}
+
 class Timer extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             name: props.initial.Name,
             descripition: props.initial.Description,
-            lastUpdate: props.initial.LastUpdate,
+            lastUpdate: Math.round(props.initial.LastUpdate / 10000000),
             elapsedTime: props.initial.PassedSeconds,
-            status: props.initial.State  
+            status: props.initial.State
         };
     }
 
-    tick(){
-        if (this.state.status !== 1){
+    tick() {
+        if (this.state.status !== 1 && this.state.status !== 3) {
             return;
         }
+
+        let status = this.state.status;
+        const elapsedTime = this.state.elapsedTime + 1;
+        if (status === 1 && elapsedTime >= this.props.initial.PeriodInSeconds) {
+            this.onTimeExpired();
+            status = 3;
+        }
+
         this.setState({
             name: this.state.name,
             descripition: this.state.descripition,
             lastUpdate: this.state.lastUpdate,
             elapsedTime: this.state.elapsedTime + 1,
-            status: this.state.status
+            status: status
         });
     }
-    
+
     componentDidMount() {
         this.interval = setInterval(() => this.tick(), 1000);
     }
@@ -38,95 +58,119 @@ class Timer extends React.Component {
     componentWillUnmount() {
         clearInterval(this.interval);
     }
-    
-    onClickPlay(){
-        if (this.state.status === 1){
+
+    onClickPlay() {
+        if (this.state.status === 1 || this.state.status === 3) {
             return;
         }
 
-        const isSuccess = fetch("/TimerApi/StartTimer?timerId=" + this.props.id,{method: 'POST'})
-            .then(res => status < 300);
-        
-        if (isSuccess){
-            this.setState({
-                name: this.state.name,
-                descripition: this.state.descripition,
-                lastUpdate: Date.now(),
-                elapsedTime: this.state.elapsedTime,
-                status: 1
+        this.sendDoActionRequest(this.props.id, "Start")
+            .then(res => {
+                if (res) {
+                    this.setState({
+                        name: this.state.name,
+                        descripition: this.state.descripition,
+                        lastUpdate: Date.now(),
+                        elapsedTime: this.state.elapsedTime,
+                        status: 1
+                    });
+                }
             });
-        }
-    }
-    
-    onClickRepeat(){
-        this.setState({
-            name: this.state.name,
-            descripition: this.state.descripition,
-            lastUpdate: Date.now(),
-            elapsedTime: 0,
-            status: 1
-        });
     }
 
-    onClickStop(){
-        if (this.state.status === 0){
+    onClickRepeat() {
+        if (this.state.status !== 1 && this.state.status !== 3) {
             return;
         }
 
-        const isSuccess = fetch("/TimerApi/StopTimer?timerId=" + this.props.id,{method: 'POST'})
-            .then(res => status < 300);
-
-        if (isSuccess){
-            this.setState({
-                name: this.state.name,
-                descripition: this.state.descripition,
-                lastUpdate: Date.now(),
-                elapsedTime: 0,
-                status: 0
+        this.sendDoActionRequest(this.props.id, "Repeat")
+            .then(res => {
+                if (res) {
+                    this.setState({
+                        name: this.state.name,
+                        descripition: this.state.descripition,
+                        lastUpdate: Date.now(),
+                        elapsedTime: 0,
+                        status: 1
+                    });
+                }
             });
-        }
     }
 
-    onClickPause(){
-        if (this.state.status === 2){
+    onClickStop() {
+        if (this.state.status === 0) {
             return;
         }
 
-        const isSuccess = fetch("/TimerApi/PauseTimer?timerId=" + this.props.id,{method: 'POST'})
-            .then(res => status < 300);
-
-        if (isSuccess){
-            this.setState({
-                name: this.state.name,
-                descripition: this.state.descripition,
-                lastUpdate: Date.now(),
-                elapsedTime: this.state.elapsedTime > 0 ? this.state.elapsedTime : 0,
-                status: 2
+        this.sendDoActionRequest(this.props.id, "Stop")
+            .then(res => {
+                this.setState({
+                    name: this.state.name,
+                    descripition: this.state.descripition,
+                    lastUpdate: Date.now(),
+                    elapsedTime: 0,
+                    status: 0
+                });
             });
-        }
     }
-    
-    onClickDelete(){
-        if (!confirm("Вы уверены, что хотите удалить таймер: \"" + this.state.name + "\"")){
+
+    onClickPause() {
+        if (this.state.status === 2) {
             return;
         }
-        const isSuccess = fetch("/TimerApi/DeleteTimer?timerId=" + this.props.id,{method: 'POST'})
-            .then(res => status < 300);
-        if (isSuccess){
-            //todo refresh list
-        }
+
+        this.sendDoActionRequest(this.props.id, "Pause")
+            .then(res => {
+                if (res) {
+                    this.setState({
+                        name: this.state.name,
+                        descripition: this.state.descripition,
+                        lastUpdate: Date.now(),
+                        elapsedTime: this.state.elapsedTime > 0 ? this.state.elapsedTime : 0,
+                        status: 2
+                    });
+                }
+            });
     }
-    
+
+    onClickDelete() {
+        if (!confirm("Вы уверены, что хотите удалить таймер: \"" + this.state.name + "\"")) {
+            return;
+        }
+
+        this.sendDoActionRequest(this.props.id, "Delete")
+            .then(res => {
+                if (res) {
+                    //todo update timers list
+                }
+            })
+    }
+
+    onTimeExpired() {
+        this
+            .sendDoActionRequest(this.props.id, "Expire")
+            .then(res => alert("It's time for '" + this.props.initial.Name + "'"));
+    }
+
+    sendDoActionRequest(id, action) {
+        return fetch("/TimerApi/DoActionOnTimer?timerId=" + id + "&action=" + action,
+            {method: 'POST'})
+            .then(res => res.status < 300);
+    }
+
     render() {
-        const elapsedSeconds = this.props.initial.PeriodInSeconds - this.state.elapsedTime;
+        const elapsedSeconds = this.state.status === 3
+            ? this.state.lastUpdate - (Math.round(Date.now() / 1000) + 62135596800)
+            : this.props.initial.PeriodInSeconds - this.state.elapsedTime;
+        
         return (<div className="timer">
             <div className="timer-body">{this.state.name} : {this.state.descripition} : {elapsedSeconds}</div>
-            <div className="timer-button timer-button-repeat" onClick={() => this.onClickRepeat()}/>
+            <Repeat onClick={() => this.onClickRepeat()}/>
             {this.state.status !== 1
-                ? <Play onClick={() => this.onClickPlay()} />
-                : <Pause onClick={() => this.onClickPause()} />}
-            <div className="timer-button timer-button-stop" onClick={() => this.onClickStop()}/>
-            <div className="timer-button timer-button-delete" onClick={() => this.onClickDelete()}/>
+                ? <Play onClick={() => this.onClickPlay()}/>
+                : <Pause onClick={() => this.onClickPause()}/>}
+            <Stop onClick={() => this.onClickStop()}/>
+            <Delete onClick={() => this.onClickDelete()}/>
         </div>);
     }
 }
@@ -140,8 +184,8 @@ class TimerList extends React.Component {
             timers: []
         };
     }
-    
-    renderTimer(timerProps){
+
+    renderTimer(timerProps) {
         return (<Timer key={timerProps.Id}
                        id={timerProps.Id}
                        initial={timerProps}

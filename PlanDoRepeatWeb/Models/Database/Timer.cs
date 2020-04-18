@@ -8,7 +8,8 @@ namespace PlanDoRepeatWeb.Models.Database
     {
         Stopped = 0,
         Active = 1,
-        Paused = 2
+        Paused = 2,
+        Expired = 3
     }
 
     public class Timer
