@@ -46,7 +46,7 @@ namespace PlanDoRepeatWeb.Controllers.Timer
         [HttpPost]
         public async Task<IActionResult> CreateTimer([FromBody] NewTimerModel newNewTimer)
         {
-            await timerService.CreateTimerAsync(HttpContext.User.Identity.Name, newNewTimer);
+            await timerService.CreateTimerAsync(HttpContext.User.Identity.Name, newNewTimer).ConfigureAwait(false);
             return Created("/Timers/AllTimers", null);
         }
     }

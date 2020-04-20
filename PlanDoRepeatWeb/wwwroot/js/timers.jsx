@@ -99,7 +99,7 @@ class Timer extends React.Component {
             name: props.initial.Name,
             descripition: props.initial.Description,
             lastUpdate: Math.round(props.initial.LastUpdate / 10000000),
-            elapsedTime: props.initial.PassedSeconds,
+            elapsedTime: props.initial.ElapsedSeconds,
             status: props.initial.State
         };
     }

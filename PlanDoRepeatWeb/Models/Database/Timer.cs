@@ -1,17 +1,8 @@
-﻿using System;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace PlanDoRepeatWeb.Models.Database
 {
-    public enum TimerState : byte
-    {
-        Stopped = 0,
-        Active = 1,
-        Paused = 2,
-        Expired = 3
-    }
-
     public class Timer
     {
         [BsonId]

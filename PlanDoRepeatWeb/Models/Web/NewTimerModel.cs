@@ -9,7 +9,8 @@ namespace PlanDoRepeatWeb.Models.Web
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("description")] public string Description { get; set; }
+        [JsonProperty("description")]
+        public string Description { get; set; }
 
         [Required(ErrorMessage = "Не задан период!")]
         [JsonProperty("period")]

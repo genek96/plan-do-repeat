@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using PlanDoRepeatWeb.Models;
 using PlanDoRepeatWeb.Models.Database;
 
 namespace PlanDoRepeatWeb.Implementations.Repositories

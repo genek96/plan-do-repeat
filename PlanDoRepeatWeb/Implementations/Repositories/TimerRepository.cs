@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Commons.MongoDB;
 using MongoDB.Driver;
 using PlanDoRepeatWeb.Configurations.DatabaseSettings;
+using PlanDoRepeatWeb.Models;
 using PlanDoRepeatWeb.Models.Database;
 
 namespace PlanDoRepeatWeb.Implementations.Repositories

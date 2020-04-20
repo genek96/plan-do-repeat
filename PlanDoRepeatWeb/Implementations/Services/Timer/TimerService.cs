@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using PlanDoRepeatWeb.Implementations.Repositories;
+using PlanDoRepeatWeb.Models;
 using PlanDoRepeatWeb.Models.Database;
 using PlanDoRepeatWeb.Models.Web;
 
@@ -16,8 +18,11 @@ namespace PlanDoRepeatWeb.Implementations.Services.Timer
             this.timerRepository = timerRepository;
         }
 
-        public Task<List<Models.Database.Timer>> GetAllTimersForUserAsync(string userId) =>
-            timerRepository.GetAllTimersAsync(userId);
+        public async Task<List<TimerModel>> GetAllTimersForUserAsync(string userId)
+        {
+            var timers = await timerRepository.GetAllTimersAsync(userId).ConfigureAwait(false);
+            return timers.Select(x => x.ToTimerModel()).ToList();
+        }
 
         public Task CreateTimerAsync(string userId, NewTimerModel newTimer) =>
             timerRepository.CreateTimerAsync(new Models.Database.Timer
