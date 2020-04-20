@@ -22,13 +22,5 @@ namespace PlanDoRepeatWeb.Controllers.Timer
         {
             return View();
         }
-
-        [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> AllTimers(TimerModel newTimer)
-        {
-            await timerService.CreateTimerAsync(HttpContext.User.Identity.Name, newTimer);
-            return RedirectToAction("AllTimers");
-        }
     }
 }

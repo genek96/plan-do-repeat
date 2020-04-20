@@ -19,12 +19,12 @@ namespace PlanDoRepeatWeb.Implementations.Services.Timer
         public Task<List<Models.Database.Timer>> GetAllTimersForUserAsync(string userId) =>
             timerRepository.GetAllTimersAsync(userId);
 
-        public Task CreateTimerAsync(string userId, TimerModel timer) =>
+        public Task CreateTimerAsync(string userId, NewTimerModel newTimer) =>
             timerRepository.CreateTimerAsync(new Models.Database.Timer
             {
-                Name = timer.Name,
-                Description = timer.Description,
-                PeriodInSeconds = timer.Period,
+                Name = newTimer.Name,
+                Description = newTimer.Description,
+                PeriodInSeconds = newTimer.Period,
                 UserId = userId
             });
 
@@ -82,8 +82,7 @@ namespace PlanDoRepeatWeb.Implementations.Services.Timer
             var currentTime = DateTime.UtcNow.Ticks;
             if (currentTimer.State == TimerState.Paused)
             {
-                passedSeconds = currentTimer.PassedSeconds
-                                + (int) TimeSpan.FromTicks(currentTime - currentTimer.LastUpdate).TotalSeconds;
+                passedSeconds = currentTimer.PassedSeconds;
             }
 
             return timerRepository.UpdateTimerStateAsync(currentTimer.Id, TimerState.Active, passedSeconds,

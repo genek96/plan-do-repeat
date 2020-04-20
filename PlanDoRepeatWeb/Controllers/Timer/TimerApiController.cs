@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PlanDoRepeatWeb.Implementations.Services;
 using System.Text.Json;
 using Commons.StringHelpers;
 using PlanDoRepeatWeb.Implementations.Services.Timer;
+using PlanDoRepeatWeb.Models.Web;
 
 namespace PlanDoRepeatWeb.Controllers.Timer
 {
@@ -21,7 +21,7 @@ namespace PlanDoRepeatWeb.Controllers.Timer
         [HttpGet]
         public async Task<IActionResult> GetAllTimers()
         {
-            var userId =  HttpContext.User.Identity.Name;
+            var userId = HttpContext.User.Identity.Name;
             var timers = await timerService
                 .GetAllTimersForUserAsync(userId)
                 .ConfigureAwait(false);
@@ -36,9 +36,18 @@ namespace PlanDoRepeatWeb.Controllers.Timer
             {
                 return BadRequest($"{nameof(timerId)} must be specified!");
             }
-            var userId =  HttpContext.User.Identity.Name;
+
+            var userId = HttpContext.User.Identity.Name;
             await timerService.DoActionOnTimer(userId, timerId, action).ConfigureAwait(false);
             return NoContent();
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CreateTimer([FromBody] NewTimerModel newNewTimer)
+        {
+            await timerService.CreateTimerAsync(HttpContext.User.Identity.Name, newNewTimer);
+            return Created("/Timers/AllTimers", null);
         }
     }
 }

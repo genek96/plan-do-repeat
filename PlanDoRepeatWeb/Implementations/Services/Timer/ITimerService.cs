@@ -8,7 +8,7 @@ namespace PlanDoRepeatWeb.Implementations.Services.Timer
     {
         Task<List<Models.Database.Timer>> GetAllTimersForUserAsync(string userId);
 
-        Task CreateTimerAsync(string userId, TimerModel timer);
+        Task CreateTimerAsync(string userId, NewTimerModel newTimer);
 
         Task UpdateTimerAsync(
             string timerId,

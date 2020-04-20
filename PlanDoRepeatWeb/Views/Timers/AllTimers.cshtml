@@ -1,14 +1,4 @@
-﻿@model PlanDoRepeatWeb.Models.Web.TimerModel
+﻿@model PlanDoRepeatWeb.Models.Web.NewTimerModel
 
-<div class="timers-list">
-    <div class="new-timer">
-        <form asp-controller="Timers" asp-action="AllTimers">
-            <input type="text" maxlength="64" name="Name" value="Название"/>
-            <input type="text" maxlength="256" name="Description" value="Описание"/>
-            <input type="number" name="Period" value="60"/>
-            <input type="submit" value="+"/>
-        </form>
-    </div>
-</div>
 <div id="content"></div>
 <script src="~/js/timers.jsx"></script>
