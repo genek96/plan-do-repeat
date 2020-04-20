@@ -6,7 +6,7 @@ using PlanDoRepeatWeb.Models.Database;
 
 namespace PlanDoRepeatWeb.Implementations.Repositories
 {
-    public class UserRepository : MongoDbContext<User>
+    public class UserRepository : MongoDbContext<User>, IUserRepository
     {
         public UserRepository(UsersDatabaseSettings settings)
             : base(settings)
@@ -14,8 +14,8 @@ namespace PlanDoRepeatWeb.Implementations.Repositories
         }
 
         public Task<User> GetUserByLoginAsync(string login) => Entities
-                .Find(x => x.Login == login)
-                .FirstOrDefaultAsync();
+            .Find(x => x.Login == login)
+            .FirstOrDefaultAsync();
 
         public Task CreateUserAsync(User user) => Entities.InsertOneAsync(user);
     }

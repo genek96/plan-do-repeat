@@ -1,3 +1,5 @@
+using JavaScriptEngineSwitcher.ChakraCore;
+using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -5,9 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using PlanDoRepeatWeb.Configurations.DatabaseSettings;
+using PlanDoRepeatWeb.Implementations.Middleware;
 using PlanDoRepeatWeb.Implementations.Repositories;
 using PlanDoRepeatWeb.Implementations.Services;
+using PlanDoRepeatWeb.Implementations.Services.Timer;
+using React.AspNet;
 
 namespace PlanDoRepeatWeb
 {
@@ -23,14 +29,19 @@ namespace PlanDoRepeatWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddReact();
+            services.AddJsEngineSwitcher(options =>
+                options.DefaultEngineName = ChakraCoreJsEngine.EngineName).AddChakraCore();
+            
             services.Configure<UsersDatabaseSettings>(Configuration.GetSection(nameof(UsersDatabaseSettings)));
             services.Configure<TimerDatabaseSettings>(Configuration.GetSection(nameof(TimerDatabaseSettings)));
 
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<UsersDatabaseSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<TimerDatabaseSettings>>().Value);
 
-            services.AddSingleton<UserRepository>();
-            services.AddSingleton<TimerRepository>();
+            services.AddSingleton(typeof(ITimerRepository), typeof(TimerRepository));
+            services.AddSingleton(typeof(IUserRepository), typeof(UserRepository));
 
             services.AddSingleton(typeof(IUsersService), typeof(UsersService));
             services.AddSingleton(typeof(ITimerService), typeof(TimerService));
@@ -56,6 +67,8 @@ namespace PlanDoRepeatWeb
                 app.UseHsts();
             }
 
+            app.UseMiddleware<ExceptionMiddleware>();
+            app.UseReact(config => { });
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

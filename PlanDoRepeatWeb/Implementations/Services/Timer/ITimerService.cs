@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using PlanDoRepeatWeb.Models.Web;
 
-namespace PlanDoRepeatWeb.Implementations.Services
+namespace PlanDoRepeatWeb.Implementations.Services.Timer
 {
     public interface ITimerService
     {
         Task<List<Models.Database.Timer>> GetAllTimersForUserAsync(string userId);
 
-        Task CreateTimerAsync(string userId, TimerModel timer);
+        Task CreateTimerAsync(string userId, NewTimerModel newTimer);
 
         Task UpdateTimerAsync(
             string timerId,
@@ -16,8 +16,6 @@ namespace PlanDoRepeatWeb.Implementations.Services
             string newDescription = null,
             int? newPeriod = null);
 
-        Task StopTimerAsync(string timerId);
-        Task RunTimerAsync(string timerId);
-        Task PauseTimerAsync(string timerId);
+        Task DoActionOnTimer(string userId, string timerId, TimerAction action);
     }
 }

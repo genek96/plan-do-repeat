@@ -1,24 +1,4 @@
-﻿@model IEnumerable<PlanDoRepeatWeb.Models.Database.Timer>
+﻿@model PlanDoRepeatWeb.Models.Web.NewTimerModel
 
-<div class="timers-list">
-    <div class="new-timer">
-        <form asp-controller="Timers" asp-action="AddNewTimer">
-            <input type="text" maxlength="64" name="Name" value="Название"/>
-            <input type="text" maxlength="256" name="Description" value="Описание"/>
-            <input type="number" name="Period" value="60"/>
-            <input type="submit" value="+"/>
-        </form>
-    </div>
-    @{
-        foreach (var timer in Model)
-        {
-            <div class="timer">
-                <div class="timer-body">@timer.Name : @timer.Description</div>
-                <div class="timer-button timer-button-repeat"></div>
-                <div class="timer-button timer-button-play"></div>
-                <div class="timer-button timer-button-stop"></div>
-                <div class="timer-button timer-button-delete"></div>
-            </div>
-        }
-    }
-</div>
+<div id="content"></div>
+<script src="~/js/timers.jsx"></script>

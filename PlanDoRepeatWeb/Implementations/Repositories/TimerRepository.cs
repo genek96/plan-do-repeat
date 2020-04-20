@@ -8,33 +8,33 @@ using PlanDoRepeatWeb.Models.Database;
 
 namespace PlanDoRepeatWeb.Implementations.Repositories
 {
-    public class TimerRepository : MongoDbContext<Timer>
+    public class TimerRepository : MongoDbContext<Timer>, ITimerRepository
     {
-        public TimerRepository(TimerDatabaseSettings settings) 
+        public TimerRepository(TimerDatabaseSettings settings)
             : base(settings)
         {
         }
 
         public Task<List<Timer>> GetAllTimersAsync(string userId) => Entities
-                .Find(x => x.UserId == userId)
-                .ToListAsync();
+            .Find(x => x.UserId == userId)
+            .ToListAsync();
 
         public Task<Timer> GetTimerAsync(string timerId) => Entities
             .Find(timer => timer.Id == timerId)
             .FirstOrDefaultAsync();
 
-        public Task UpdateTimerMetaAsync(
+        public Task UpdateTimerStateAsync(
             string timerId,
             TimerState newState,
             int passedSeconds,
             long lastUpdate)
         {
             return Entities.UpdateOneAsync(
-               new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId),
-               Builders<Timer>.Update
-                   .Set(timer => timer.State, newState)
-                   .Set(timer => timer.PassedSeconds, passedSeconds)
-                   .Set(timer => timer.LastUpdate, lastUpdate));
+                new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId),
+                Builders<Timer>.Update
+                    .Set(timer => timer.State, newState)
+                    .Set(timer => timer.PassedSeconds, passedSeconds)
+                    .Set(timer => timer.LastUpdate, lastUpdate));
         }
 
         public Task CreateTimerAsync(Timer timer)
@@ -70,10 +70,12 @@ namespace PlanDoRepeatWeb.Implementations.Repositories
             {
                 updateDefinition = updateDefinition.Set(timer => timer.Name, newName);
             }
+
             if (newDescription != null)
             {
                 updateDefinition = updateDefinition.Set(timer => timer.Description, newDescription);
             }
+
             if (newPeriod.HasValue)
             {
                 ValidatePeriod(newPeriod.Value);
@@ -81,6 +83,12 @@ namespace PlanDoRepeatWeb.Implementations.Repositories
             }
 
             return Entities.UpdateOneAsync(filter, updateDefinition);
+        }
+
+        public Task DeleteTimerAsync(string timerId)
+        {
+            var filter = new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId);
+            return Entities.DeleteOneAsync(filter);
         }
 
         private static void ValidatePeriod(int periodInSeconds)
