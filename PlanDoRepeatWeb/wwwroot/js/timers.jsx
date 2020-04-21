@@ -18,6 +18,10 @@ function Delete(props) {
     return (<div className="timer-button timer-button-delete" onClick={props.onClick}/>);
 }
 
+function getCurrentTimeInSeconds(){
+    return Math.round(Date.now() / 1000) + 62135596800;
+}
+
 class CreateTimer extends React.Component {
     constructor(props) {
         super(props);
@@ -95,11 +99,16 @@ class CreateTimer extends React.Component {
 class Timer extends React.Component {
     constructor(props) {
         super(props);
+        
+        const elapsed = props.initial.State === 1 || props.initial.State === 3
+            ? props.initial.ElapsedSeconds + (getCurrentTimeInSeconds() - props.initial.LastUpdate)
+            : props.initial.ElapsedSeconds;
+        
         this.state = {
             name: props.initial.Name,
             descripition: props.initial.Description,
-            lastUpdate: Math.round(props.initial.LastUpdate / 10000000),
-            elapsedTime: props.initial.ElapsedSeconds,
+            lastUpdate: props.initial.LastUpdate,
+            elapsedTime: elapsed,
             status: props.initial.State
         };
     }
@@ -115,7 +124,7 @@ class Timer extends React.Component {
         if (status === 1 && elapsedTime >= this.props.initial.PeriodInSeconds) {
             this.onTimeExpired();
             status = 3;
-            lastUpdate = (Math.round(Date.now() / 1000) + 62135596800);
+            lastUpdate = getCurrentTimeInSeconds();
         }
 
         this.setState({
@@ -146,7 +155,7 @@ class Timer extends React.Component {
                     this.setState({
                         name: this.state.name,
                         descripition: this.state.descripition,
-                        lastUpdate: Date.now(),
+                        lastUpdate: getCurrentTimeInSeconds(),
                         elapsedTime: this.state.elapsedTime,
                         status: 1
                     });
@@ -155,17 +164,13 @@ class Timer extends React.Component {
     }
 
     onClickRepeat() {
-        if (this.state.status !== 1 && this.state.status !== 3) {
-            return;
-        }
-
         this.sendDoActionRequest(this.props.id, "Repeat")
             .then(res => {
                 if (res) {
                     this.setState({
                         name: this.state.name,
                         descripition: this.state.descripition,
-                        lastUpdate: Date.now(),
+                        lastUpdate: getCurrentTimeInSeconds(),
                         elapsedTime: 0,
                         status: 1
                     });
@@ -183,7 +188,7 @@ class Timer extends React.Component {
                 this.setState({
                     name: this.state.name,
                     descripition: this.state.descripition,
-                    lastUpdate: Date.now(),
+                    lastUpdate: getCurrentTimeInSeconds(),
                     elapsedTime: 0,
                     status: 0
                 });
@@ -201,7 +206,7 @@ class Timer extends React.Component {
                     this.setState({
                         name: this.state.name,
                         descripition: this.state.descripition,
-                        lastUpdate: Date.now(),
+                        lastUpdate: getCurrentTimeInSeconds(),
                         elapsedTime: this.state.elapsedTime > 0 ? this.state.elapsedTime : 0,
                         status: 2
                     });
@@ -234,10 +239,8 @@ class Timer extends React.Component {
     }
 
     render() {
-        const elapsedSeconds = this.state.status === 3
-            ? this.state.lastUpdate - (Math.round(Date.now() / 1000) + 62135596800)
-            : this.props.initial.PeriodInSeconds - this.state.elapsedTime;
-
+        const elapsedSeconds = this.props.initial.PeriodInSeconds - this.state.elapsedTime;
+        
         return (<div className="timer">
             <div className="timer-body">{this.state.name} : {this.state.descripition} : {elapsedSeconds}</div>
             <Repeat onClick={() => this.onClickRepeat()}/>

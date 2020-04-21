@@ -12,7 +12,7 @@
 
         public int ElapsedSeconds { get; set; }
 
-        public long LastUpdate { get; set; }    //UTC time in ticks
+        public long LastUpdate { get; set; }    //UTC time in seconds
 
         public TimerState State { get; set; }
     }
