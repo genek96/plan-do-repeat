@@ -13,7 +13,7 @@ namespace PlanDoRepeatWeb.Models
                 Name = timer.Name,
                 Description = timer.Description,
                 ElapsedSeconds = timer.PassedSeconds,
-                LastUpdate = timer.LastUpdate,
+                LastUpdate = timer.LastUpdate / 10000000,
                 PeriodInSeconds = timer.PeriodInSeconds,
                 State = timer.State
             };

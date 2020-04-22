@@ -50,8 +50,10 @@ namespace PlanDoRepeatWeb.Implementations.Services.Timer
             switch (action)
             {
                 case TimerAction.Start:
-                case TimerAction.Repeat:
                     await RunTimerAsync(currentTimer).ConfigureAwait(false);
+                    break;
+                case TimerAction.Repeat:
+                    await RerunTimerAsync(currentTimer).ConfigureAwait(false);
                     break;
                 case TimerAction.Stop:
                     await StopTimerAsync(currentTimer).ConfigureAwait(false);
@@ -92,6 +94,11 @@ namespace PlanDoRepeatWeb.Implementations.Services.Timer
 
             return timerRepository.UpdateTimerStateAsync(currentTimer.Id, TimerState.Active, passedSeconds,
                 currentTime);
+        }
+        
+        private Task RerunTimerAsync(Models.Database.Timer currentTimer)
+        {
+            return timerRepository.UpdateTimerStateAsync(currentTimer.Id, TimerState.Active, 0, DateTime.UtcNow.Ticks);
         }
 
         private Task DeleteTimerAsync(Models.Database.Timer currentTimer)
