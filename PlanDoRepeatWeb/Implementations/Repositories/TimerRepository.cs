@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Commons.MongoDB;
 using MongoDB.Driver;
@@ -9,95 +10,94 @@ using PlanDoRepeatWeb.Models.Database;
 
 namespace PlanDoRepeatWeb.Implementations.Repositories
 {
-    public class TimerRepository : MongoDbContext<Timer>, ITimerRepository
-    {
-        public TimerRepository(TimerDatabaseSettings settings)
-            : base(settings)
-        {
-        }
+	public class TimerRepository : MongoDbRepository<Timer>, ITimerRepository
+	{
+		public TimerRepository(TimerDatabaseSettings settings)
+			: base(settings)
+		{
+		}
 
-        public Task<List<Timer>> GetAllTimersAsync(string userId) => Entities
-            .Find(x => x.UserId == userId)
-            .ToListAsync();
+		public IAsyncEnumerable<Timer> GetAllTimersAsync(string userId)
+		{
+			return FindAsync(t => t.UserId == userId);
+		}
 
-        public Task<Timer> GetTimerAsync(string timerId) => Entities
-            .Find(timer => timer.Id == timerId)
-            .FirstOrDefaultAsync();
+		public ValueTask<Timer> GetTimerAsync(string timerId)
+		{
+			return FindAsync(t => t.Id == timerId).FirstOrDefaultAsync();
+		}
 
-        public Task UpdateTimerStateAsync(
-            string timerId,
-            TimerState newState,
-            int passedSeconds,
-            long lastUpdate)
-        {
-            return Entities.UpdateOneAsync(
-                new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId),
-                Builders<Timer>.Update
-                    .Set(timer => timer.State, newState)
-                    .Set(timer => timer.PassedSeconds, passedSeconds)
-                    .Set(timer => timer.LastUpdate, lastUpdate));
-        }
+		public Task UpdateTimerStateAsync(
+			string timerId,
+			TimerState newState,
+			int passedSeconds,
+			long lastUpdate)
+		{
+			return UpdateAsync(
+				t => t.Id == timerId,
+				b => b.Set(t => t.State, newState)
+					.Set(t => t.PassedSeconds, passedSeconds)
+					.Set(t => t.LastUpdate, lastUpdate));
+		}
 
-        public Task CreateTimerAsync(Timer timer)
-        {
-            ValidatePeriod(timer.PeriodInSeconds);
-            return Entities
-                .InsertOneAsync(
-                    new Timer
-                    {
-                        Name = timer.Name,
-                        Description = timer.Description,
-                        PeriodInSeconds = timer.PeriodInSeconds,
-                        UserId = timer.UserId,
-                        State = TimerState.Active,
-                        PassedSeconds = 0,
-                        LastUpdate = DateTime.UtcNow.Ticks
-                    });
-        }
+		public Task CreateTimerAsync(Timer timer)
+		{
+			ValidatePeriod(timer.PeriodInSeconds);
+			return AddAsync(new Timer
+			{
+				Name = timer.Name,
+				Description = timer.Description,
+				PeriodInSeconds = timer.PeriodInSeconds,
+				UserId = timer.UserId,
+				State = TimerState.Active,
+				PassedSeconds = 0,
+				LastUpdate = DateTime.UtcNow.Ticks
+			});
+		}
 
-        public Task UpdateTimerAsync(
-            string timerId,
-            string newName = null,
-            string newDescription = null,
-            int? newPeriod = null)
-        {
-            var filter = new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId);
-            var updateDefinition = Builders<Timer>.Update
-                .Set(timer => timer.PassedSeconds, 0)
-                .Set(timer => timer.State, TimerState.Paused)
-                .Set(timer => timer.LastUpdate, DateTime.UtcNow.Ticks);
+		public Task UpdateTimerAsync(
+			string timerId,
+			string newName = null,
+			string newDescription = null,
+			int? newPeriod = null)
+		{
+			return UpdateAsync(
+				timer => timer.Id == timerId,
+				b =>
+				{
+					if (newName != null)
+					{
+						b.Set(t => t.Name, newName);
+					}
 
-            if (newName != null)
-            {
-                updateDefinition = updateDefinition.Set(timer => timer.Name, newName);
-            }
+					if (newDescription != null)
+					{
+						b.Set(t => t.Description, newDescription);
+					}
 
-            if (newDescription != null)
-            {
-                updateDefinition = updateDefinition.Set(timer => timer.Description, newDescription);
-            }
+					if (newPeriod.HasValue)
+					{
+						ValidatePeriod(newPeriod.Value);
+						b.Set(t => t.PeriodInSeconds, newPeriod);
+					}
 
-            if (newPeriod.HasValue)
-            {
-                ValidatePeriod(newPeriod.Value);
-                updateDefinition.Set(timer => timer.PeriodInSeconds, newPeriod.Value);
-            }
+					return b.Set(t => t.PassedSeconds, 0)
+						.Set(t => t.State, TimerState.Paused)
+						.Set(t => t.LastUpdate, DateTime.UtcNow.Ticks);
+				});
+		}
 
-            return Entities.UpdateOneAsync(filter, updateDefinition);
-        }
+		public Task DeleteTimerAsync(string timerId)
+		{
+			return DeleteOneAsync(timer => timer.Id == timerId);
+		}
 
-        public Task DeleteTimerAsync(string timerId)
-        {
-            var filter = new FilterDefinitionBuilder<Timer>().Where(timer => timer.Id == timerId);
-            return Entities.DeleteOneAsync(filter);
-        }
-
-        private static void ValidatePeriod(int periodInSeconds)
-        {
-            if (periodInSeconds < 30)
-            {
-                throw new ArgumentException("Time period can not be less than 30 seconds!");
-            }
-        }
-    }
+		private static void ValidatePeriod(int periodInSeconds)
+		{
+			if (periodInSeconds < 30)
+			{
+				throw new ArgumentException("Time period can not be less than 30 seconds!");
+			}
+		}
+	}
 }

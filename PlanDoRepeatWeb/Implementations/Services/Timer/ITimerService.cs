@@ -6,7 +6,7 @@ namespace PlanDoRepeatWeb.Implementations.Services.Timer
 {
     public interface ITimerService
     {
-        Task<List<TimerModel>> GetAllTimersForUserAsync(string userId);
+        ValueTask<TimerModel[]> GetAllTimersForUserAsync(string userId);
 
         Task CreateTimerAsync(string userId, NewTimerModel newTimer);
 

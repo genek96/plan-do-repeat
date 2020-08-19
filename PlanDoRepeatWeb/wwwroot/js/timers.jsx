@@ -114,7 +114,7 @@ class Timer extends React.Component {
     }
 
     tick() {
-        if (this.state.status !== 1 && this.state.status !== 3) {
+        if (this.state.status !== 1) {
             return;
         }
 

@@ -22,10 +22,8 @@ namespace PlanDoRepeatWeb.Controllers.Timer
         public async Task<IActionResult> GetAllTimers()
         {
             var userId = HttpContext.User.Identity.Name;
-            var timers = await timerService
-                .GetAllTimersForUserAsync(userId)
-                .ConfigureAwait(false);
-            return Content(JsonSerializer.Serialize(timers, timers.GetType()));
+            var timers = await timerService.GetAllTimersForUserAsync(userId);
+            return Content(JsonSerializer.Serialize(timers));
         }
 
         [Authorize]

@@ -5,25 +5,25 @@ using PlanDoRepeatWeb.Models.Database;
 
 namespace PlanDoRepeatWeb.Implementations.Repositories
 {
-    public interface ITimerRepository
-    {
-        Task<List<Timer>> GetAllTimersAsync(string userId);
-        Task<Timer> GetTimerAsync(string timerId);
+	public interface ITimerRepository
+	{
+		IAsyncEnumerable<Timer> GetAllTimersAsync(string userId);
+		ValueTask<Timer> GetTimerAsync(string timerId);
 
-        Task UpdateTimerStateAsync(
-            string timerId,
-            TimerState newState,
-            int passedSeconds,
-            long lastUpdate);
+		Task UpdateTimerStateAsync(
+			string timerId,
+			TimerState newState,
+			int passedSeconds,
+			long lastUpdate);
 
-        Task CreateTimerAsync(Timer timer);
+		Task CreateTimerAsync(Timer timer);
 
-        Task UpdateTimerAsync(
-            string timerId,
-            string newName = null,
-            string newDescription = null,
-            int? newPeriod = null);
+		Task UpdateTimerAsync(
+			string timerId,
+			string newName = null,
+			string newDescription = null,
+			int? newPeriod = null);
 
-        Task DeleteTimerAsync(string timerId);
-    }
+		Task DeleteTimerAsync(string timerId);
+	}
 }

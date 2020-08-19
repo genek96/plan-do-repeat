@@ -18,10 +18,12 @@ namespace PlanDoRepeatWeb.Implementations.Services.Timer
             this.timerRepository = timerRepository;
         }
 
-        public async Task<List<TimerModel>> GetAllTimersForUserAsync(string userId)
+        public ValueTask<TimerModel[]> GetAllTimersForUserAsync(string userId)
         {
-            var timers = await timerRepository.GetAllTimersAsync(userId).ConfigureAwait(false);
-            return timers.Select(x => x.ToTimerModel()).ToList();
+            return timerRepository
+                .GetAllTimersAsync(userId)
+                .Select(x => x.ToTimerModel())
+                .ToArrayAsync();
         }
 
         public Task CreateTimerAsync(string userId, NewTimerModel newTimer) =>
